@@ -1,0 +1,8 @@
+# Ignore files không cần thiết khi deploy
+node_modules/
+.git/
+*.md
+.env.local
+.env.development
+*.log
+
