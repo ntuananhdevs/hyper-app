@@ -1,3 +1,4 @@
+```
 my-streaming-app/
 ├── cmd/                                    # 🚀 ĐIỂM KHỞI CHẠY (Entry points)
 │   ├── api/
@@ -62,3 +63,4 @@ my-streaming-app/
 ├── docker-compose.yml                      # Chạy Postgres + Scylla local
 ├── go.mod
 └── go.sum
+```
