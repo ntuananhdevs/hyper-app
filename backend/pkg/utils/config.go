@@ -21,22 +21,15 @@ func LoadConfig(path string) (config Config, err error) {
 	viper.SetConfigFile(".env") 
 	viper.SetConfigType("env")  
 
-	// 2. Tự động đọc biến môi trường (nếu có trên server thật/Docker)
-	// Để sau này deploy, bạn set env trên server nó sẽ ưu tiên đè lên file .env
 	viper.AutomaticEnv()
 
-	// 3. Đọc file config
 	err = viper.ReadInConfig()
 	if err != nil {
-		// Nếu không tìm thấy file .env cũng không sao (có thể chạy bằng env hệ thống)
-		// Nhưng nếu lỗi định dạng file thì return lỗi
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return
 		}
 	}
 
-	// 4. MA THUẬT NẰM Ở ĐÂY:
-	// Viper tự động map toàn bộ dữ liệu vào struct Config dựa trên tag mapstructure
 	err = viper.Unmarshal(&config)
 	return
 }
