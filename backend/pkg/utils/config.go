@@ -2,43 +2,51 @@ package utils
 
 import (
 	"fmt"
-
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DB_DRIVER string `mapstructure:"DB_DRIVER"`
-	DB_HOST int `mapstructure:"DB_HOST"`
-	DB_PORT int `mapstructure:"DB_PORT"`
-	DB_DATABASE string `mapstructure:"DB_DATABASE"`
-	DB_USERNAME string `mapstructure:"DB_USERNAME"`
-	DB_PASSWORD string `mapstructure:"DB_PASSWORD"`
+	DBDriver   string `mapstructure:"DB_DRIVER"`
+	DBHost     string `mapstructure:"DB_HOST"`
+	DBPort     int    `mapstructure:"DB_PORT"`
+	DBDatabase string `mapstructure:"DB_DATABASE"`
+	DBUsername string `mapstructure:"DB_USERNAME"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
 
-	ServerPort string `mapstructure:"SERVER_PORT"`
+	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
+	viper.SetConfigFile(".env") 
+	viper.SetConfigType("env")  
 
+	// 2. Tự động đọc biến môi trường (nếu có trên server thật/Docker)
+	// Để sau này deploy, bạn set env trên server nó sẽ ưu tiên đè lên file .env
 	viper.AutomaticEnv()
-	
-	err = viper.ReadInConfig() 
+
+	// 3. Đọc file config
+	err = viper.ReadInConfig()
 	if err != nil {
-		return
+		// Nếu không tìm thấy file .env cũng không sao (có thể chạy bằng env hệ thống)
+		// Nhưng nếu lỗi định dạng file thì return lỗi
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return
+		}
 	}
 
+	// 4. MA THUẬT NẰM Ở ĐÂY:
+	// Viper tự động map toàn bộ dữ liệu vào struct Config dựa trên tag mapstructure
 	err = viper.Unmarshal(&config)
 	return
 }
 
 func (c *Config) GetDBSource() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		c.DB_USERNAME,
-		c.DB_PASSWORD,
-		c.DB_HOST,
-		c.DB_PORT,
-		c.DB_DATABASE,
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		c.DBUsername,
+		c.DBPassword,
+		c.DBHost,
+		c.DBPort,
+		c.DBDatabase,
 	)
 }
