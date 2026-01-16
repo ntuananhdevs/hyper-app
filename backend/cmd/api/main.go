@@ -5,17 +5,17 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ntuananhdevs/hyper-app/internal/config"
 	"github.com/ntuananhdevs/hyper-app/internal/repository/postgres"
-	"github.com/ntuananhdevs/hyper-app/pkg/utils"
 )
 
 func main() {
-	config, err := utils.LoadConfig(".")
+	cfg, err := config.LoadConfig(".")
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	_, connPool := postgres.NewPostgres(context.Background(), config.GetDBSource())
+	_, connPool := postgres.NewPostgres(context.Background(), cfg.GetDBSource())
 	defer connPool.Close()
 
 	r := gin.Default()
@@ -27,6 +27,6 @@ func main() {
 		})
 	})
 
-	r.Run(config.ServerAddress)
+	r.Run(cfg.ServerAddress)
 
 }
